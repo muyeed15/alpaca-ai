@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Alpaca AI - A modern AI chat interface powered by Ollama">
+    <meta name="theme-color" content="#000000">
+
+    <title>Alpaca AI - Intelligent Conversations</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%23000000'/%3E%3Ctext x='16' y='22' font-family='Inter' font-size='18' font-weight='bold' text-anchor='middle' fill='white'%3EA%3C/text%3E%3C/svg%3E">
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" role="navigation">
+            <div class="sidebar-header">
+                <h1>
+                    <div class="logo-icon" aria-hidden="true"></div>
+                    Alpaca AI
+                </h1>
+                <button class="btn btn-primary" id="new-chat-btn" aria-label="Start new chat">
+                    <span class="icon" aria-hidden="true">+</span>
+                    New Chat
+                </button>
+                <button class="btn btn-secondary" id="manage-models-btn" aria-label="Manage AI models">
+                    <span class="icon" aria-hidden="true">⚙</span>
+                    Manage Models
+                </button>
+            </div>
+
+            <div class="chat-list" id="chat-list" role="list" aria-label="Chat history">
+                <!-- Chat items will be dynamically loaded here -->
+                <div class="empty-message" role="status">
+                    <p>No chats yet. Start a new conversation!</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area" role="main">
+            <header class="chat-header" role="banner">
+                <div class="chat-info">
+                    <h2 id="chat-title">Welcome to Alpaca AI</h2>
+                    <p id="chat-model" class="chat-subtitle">Select a model to start chatting</p>
+                </div>
+                <div class="chat-actions" role="toolbar">
+                    <button class="btn btn-icon" id="delete-chat-btn" style="display: none;"
+                        aria-label="Delete current chat" title="Delete chat">
+                        <span class="icon" aria-hidden="true">🗑</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
+                <div class="welcome-message">
+                    <h3>Start a conversation</h3>
+                    <p>Choose a model and type your message to begin exploring the capabilities of AI</p>
+                </div>
+            </div>
+
+            <div class="input-area" role="form">
+                <div class="model-selector">
+                    <label for="model-select" class="visually-hidden">Select AI model</label>
+                    <select id="model-select" class="model-dropdown" aria-label="Select AI model" required>
+                        <option value="">Select a model...</option>
+                    </select>
+                </div>
+
+                <div class="message-input-container">
+                    <label for="message-input" class="visually-hidden">Type your message</label>
+                    <textarea id="message-input" class="message-input" placeholder="Type your message here..." rows="1"
+                        aria-label="Type your message" autocomplete="off" spellcheck="true"></textarea>
+                    <button id="send-btn" class="btn btn-send" disabled aria-label="Send message" title="Send message">
+                        <span class="icon" aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Model Modal -->
+    <div id="custom-model-modal" class="modal" style="display: none;" role="dialog" aria-modal="true"
+        aria-label="Manage custom models">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Manage Custom Models</h2>
+                <button class="btn btn-icon" id="close-modal-btn" aria-label="Close modal">
+                    <span class="icon" aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form class="custom-model-form" id="custom-model-form" novalidate>
+                    <input type="hidden" id="model-id" value="">
+
+                    <div class="form-group">
+                        <label for="model-name">Model Name</label>
+                        <input type="text" id="model-name" placeholder="e.g., Python Expert, Creative Writer" required
+                            autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="base-model-select">Base Model</label>
+                        <select id="base-model-select" required>
+                            <option value="">Select base model...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="system-prompt">System Prompt</label>
+                        <textarea id="system-prompt" rows="4"
+                            placeholder="Enter the system prompt that defines this model's behavior..."
+                            required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="save-model-btn" class="btn btn-primary">
+                            Save Model
+                        </button>
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <div class="custom-models-list">
+                    <h3>Existing Custom Models</h3>
+                    <div id="models-list" role="list" aria-label="Custom models list">
+                        <!-- Custom models will be dynamically loaded here -->
+                        <div class="empty-message" role="status">
+                            <p>No custom models yet. Create your first one above!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
