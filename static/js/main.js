@@ -871,7 +871,6 @@ function showWelcomeScreen() {
     elements.messages.innerHTML = `
         <div class="welcome-message">
             <h3>Welcome to Alpaca AI</h3>
-            <p>Your intelligent conversation partner powered by advanced language models.</p>
             <p>Select a model and start a new chat to begin exploring the capabilities of AI.</p>
         </div>
     `;
